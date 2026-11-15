@@ -1,13 +1,14 @@
 # speakersafetyd 2.0.1 (the release Fedora and ALARM ship) with two downstream
-# fixes: a sense period read after a startup probe closed the speakers no
-# longer panics the daemon (0002, as fedora-aurora's 2.0.1-1.aurora1), and a
-# machine's own configuration (apple/j575c.conf) is tried before its family's
-# (apple/j575.conf) (0003). 0001 is Fedora's j504 config backport. [aurora]
-# precedes the other repositories in pacman.conf, so this build is the one
-# installed.
+# fixes and one new machine: a sense period read after a startup probe closed
+# the speakers no longer panics the daemon (0002, as fedora-aurora's
+# 2.0.1-1.aurora1), a machine's own configuration (apple/j575c.conf) is tried
+# before its family's (apple/j575.conf) (0003), and the MacBook Pro 14-inch
+# (M4, J604) gets its board file, its udev trigger and a test that loads it
+# (0004). 0001 is Fedora's j504 config backport. [aurora] precedes the other
+# repositories in pacman.conf, so this build is the one installed.
 pkgname=speakersafetyd
 pkgver=2.0.1
-pkgrel=1.2
+pkgrel=1.3
 pkgdesc='Speaker protection daemon for embedded Linux systems (Aurora build)'
 arch=('aarch64')
 license=('MIT')
@@ -17,16 +18,19 @@ depends=('alsa-lib' 'gcc-libs' 'glibc' 'systemd')
 source=("$pkgname-$pkgver.tar.gz::https://static.crates.io/crates/$pkgname/$pkgname-$pkgver.crate"
         0001-j504-Write-the-full-speaker-names-in-conf.patch
         0002-skip-a-sense-period-read-after-a-probe-closed-the-speakers.patch
-        0003-try-the-machine-s-own-config-before-its-family-s.patch)
+        0003-try-the-machine-s-own-config-before-its-family-s.patch
+        0004-j604-add-the-J604-board-file-and-its-udev-trigger.patch)
 sha256sums=('30101e673466072a080e321df3b7d1165dd8b79246ba393b82bb09d8325dd814'
             '9c1060ca170f52ceb2a68fd1d3c67a31edc4171473b65c239de2115ac8c1870f'
             '40fa32b197413c5a5e2f8c0e4c45e4469d99e3be216cc3c3c05c2a2642105cbe'
-            '34f1e65fe71f5f8afe6f50a9409e9b9464006282fcaead4554092e719ead5d83')
+            '34f1e65fe71f5f8afe6f50a9409e9b9464006282fcaead4554092e719ead5d83'
+            '30014703c0bdc080d344369f093a780856c12855e289439b8243532f43fad53c')
 prepare() {
   cd "$pkgname-$pkgver"
   patch -Np1 < ../0001-j504-Write-the-full-speaker-names-in-conf.patch
   patch -Np1 < ../0002-skip-a-sense-period-read-after-a-probe-closed-the-speakers.patch
   patch -Np1 < ../0003-try-the-machine-s-own-config-before-its-family-s.patch
+  patch -Np1 < ../0004-j604-add-the-J604-board-file-and-its-udev-trigger.patch
 }
 build() { cd "$pkgname-$pkgver"; cargo build --locked --release; }
 check() { cd "$pkgname-$pkgver"; cargo test --locked --release; }
